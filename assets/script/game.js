@@ -9,6 +9,9 @@ const plr = eleID('plyr');
 const ground = eleID('lvl');
 const score = eleID('score');
 
+const firesound = new sound('./assets/sounds/fire.mp3');
+const hitsound = new sound('./assets/sounds/hit.mp3');
+
 document.onkeypress = e => {
 
     let moveRight, moveLeft, moveTop, moveBottom;
@@ -29,9 +32,6 @@ document.onkeypress = e => {
         moveBottom = canMoveBottom(plr.offsetTop + MOVE);
         set_state(plr, { top: `${moveBottom}px` });
     }
-    // if (e.keyCode == 32) {
-    //     genEnemy();
-    // }
 }
 
 document.onclick = e => {
@@ -72,11 +72,13 @@ function genEnemy() {
             gameover.innerHTML = `<h3>Game Over<br>Refresh to start again<br>
                                     Score:${Score}</h3>`;
             gameover.classList.add('gameover');
-            flag=1;
+            flag = 1;
             ground.appendChild(gameover);
+            clearInterval(enemup);
+            clearInterval(collup);
         }
     }
-    setInterval(() => {
+    let collup =setInterval(() => {
         follow();
         collitionCHK();
     }, 1);
@@ -89,6 +91,7 @@ function fireBlet(dest) {
     let initYPOS = plr.offsetTop;
     blt.classList.add('blt');
     ground.appendChild(blt);
+    firesound.play();
     set_state(blt, { top: `${initYPOS}px`, left: `${initXPOS}px` });
 
     setTimeout(() => {
@@ -106,9 +109,9 @@ function fireBlet(dest) {
             if (hasIntersect(ene[i], blt)) {
                 ene[i].remove();
                 blt.remove();
-                if(!flag)
+                hitsound.play();
+                if (!flag)
                     Score++;
-                // score.innerHTML = `Socre:${Score}`
             }
         }
     }
@@ -125,9 +128,9 @@ function hasIntersect(ele1, ele2) {
 
 function canGen(init) {
     return (init.PosX > plr.offsetLeft - plr.offsetWidth &&
-        init.PosX <= plr.offsetLeft + plr.offsetWidth * 2) && 
-    (init.PosY > plr.offsetTop - plr.offsetHeight &&
-    init.PosY <= plr.offsetTop + plr.offsetHeight)
+        init.PosX <= plr.offsetLeft + plr.offsetWidth * 2) &&
+        (init.PosY > plr.offsetTop - plr.offsetHeight &&
+            init.PosY <= plr.offsetTop + plr.offsetHeight)
 }
 function canMoveLeft(val) {
     if (val < 0)
@@ -150,8 +153,23 @@ function canMoveBottom(val) {
     else return val;
 }
 
-setInterval(() => {
+let enemup = setInterval(() => {
     genEnemy();
 }, 1000);
 
+    
 
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function () {
+        this.sound.play();
+    }
+    this.stop = function () {
+        this.sound.pause();
+    }
+}
