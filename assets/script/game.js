@@ -4,9 +4,11 @@ let crtEle = () => document.createElement('div');
 let set_state = (elem, styles) => Object.assign(elem.style, styles);
 const MOVE = 200;
 let Score = 0;
+let flag = 0;
 const plr = eleID('plyr');
 const ground = eleID('lvl');
-const score = eleID('score')
+const score = eleID('score');
+
 document.onkeypress = e => {
 
     let moveRight, moveLeft, moveTop, moveBottom;
@@ -67,8 +69,10 @@ function genEnemy() {
         if (hasIntersect(ene, plr)) {
             plr.remove();
             let gameover = crtEle('div');
-            gameover.innerHTML = '<h6>Game Over<br>Refresh to start again</h6>';
+            gameover.innerHTML = `<h3>Game Over<br>Refresh to start again<br>
+                                    Score:${Score}</h3>`;
             gameover.classList.add('gameover');
+            flag=1;
             ground.appendChild(gameover);
         }
     }
@@ -102,7 +106,8 @@ function fireBlet(dest) {
             if (hasIntersect(ene[i], blt)) {
                 ene[i].remove();
                 blt.remove();
-                // Score++;
+                if(!flag)
+                    Score++;
                 // score.innerHTML = `Socre:${Score}`
             }
         }
